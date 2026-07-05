@@ -1,0 +1,12 @@
+PySide6
+numpy
+scipy
+sounddevice
+soundfile
+librosa
+pydub
+pedalboard
+audioread
+pyqtgraph
+mutagen
+Pillow
