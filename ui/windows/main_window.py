@@ -17,6 +17,7 @@ from PySide6.QtCore import Qt
 from ui.widgets.panel import Panel
 from config.constants import APP_NAME
 from ui.widgets.deck.deck_widget import DeckWidget
+from ui.widgets.browser.browser_widget import BrowserWidget
 
 
 class MainWindow(QMainWindow):
@@ -54,8 +55,8 @@ class MainWindow(QMainWindow):
         center_layout.setSpacing(8)
 
         # Browser
-        browser = Panel("Browser")
-        browser.setMinimumWidth(300)
+        browser = BrowserWidget()
+        browser.setMinimumWidth(340)
 
         # Deck A
         self.deck_a = DeckWidget("Deck A")

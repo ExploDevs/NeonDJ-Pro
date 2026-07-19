@@ -72,3 +72,31 @@ class TrackRepository:
         )
 
         return cursor.fetchall()
+    
+    def search_tracks(self, text: str):
+
+        cursor = self.database.connection.cursor()
+
+        cursor.execute(
+            """
+            SELECT *
+            FROM tracks
+
+            WHERE
+
+                title LIKE ?
+
+                OR artist LIKE ?
+
+                OR album LIKE ?
+
+            ORDER BY title
+            """,
+            (
+                f"%{text}%",
+                f"%{text}%",
+                f"%{text}%"
+            )
+        )
+
+        return cursor.fetchall()
