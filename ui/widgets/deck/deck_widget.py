@@ -1,0 +1,141 @@
+"""
+NeonDJ Pro
+Deck Widget (UI-only Version)
+
+Simuliert ein DJ-Deck ohne Audio-Engine.
+Vorbereitung für späteren Sound Layer.
+"""
+
+from PySide6.QtWidgets import (
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QPushButton,
+    QLabel,
+    QSlider,
+)
+from PySide6.QtCore import Qt
+from PySide6.QtCore import QTimer
+from ui.widgets.waveform.waveform_widget import WaveformWidget
+import time
+from audio.transport import DeckTransport
+
+
+class DeckWidget(QWidget):
+    """
+    Ein vollständiges DJ-Deck (UI Simulation).
+    """
+
+    def __init__(self, deck_name: str = "Deck") -> None:
+        super().__init__()
+
+        self.deck_name = deck_name
+        
+        # Transport-Engine dieses Decks
+        self.transport = DeckTransport()
+
+        self.timer = QTimer()
+        self.timer.setInterval(30)  # ~33 FPS UI Update
+        self.timer.timeout.connect(self._update_playhead)
+
+        self._build_ui()
+
+    def _build_ui(self) -> None:
+        layout = QVBoxLayout(self)
+        layout.setSpacing(8)
+
+        # ---------------- HEADER ----------------
+        self.title = QLabel(self.deck_name)
+        self.title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.title.setStyleSheet("font-size: 16px; font-weight: bold;")
+        layout.addWidget(self.title)
+
+        # ---------------- STATUS ----------------
+        self.status = QLabel("STOPPED")
+        self.status.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.status.setStyleSheet("color: #00E5FF;")
+        layout.addWidget(self.status)
+
+        # ---------------- BUTTON ROW ----------------
+        btn_row = QHBoxLayout()
+
+        self.play_btn = QPushButton("▶ Play")
+        self.play_btn.clicked.connect(self.toggle_play)
+
+        self.cue_btn = QPushButton("Cue")
+        self.stop_btn = QPushButton("Stop")
+
+        self.stop_btn.clicked.connect(self.stop)
+
+        btn_row.addWidget(self.play_btn)
+        btn_row.addWidget(self.cue_btn)
+        btn_row.addWidget(self.stop_btn)
+
+        layout.addLayout(btn_row)
+
+        # ---------------- PITCH ----------------
+        self.pitch = QSlider(Qt.Orientation.Horizontal)
+        self.pitch.setMinimum(-100)
+        self.pitch.setMaximum(100)
+        self.pitch.setValue(0)
+
+        layout.addWidget(QLabel("Pitch"))
+        layout.addWidget(self.pitch)
+
+        # ---------------- PLACEHOLDER WAVEFORM ----------------
+        self.waveform = WaveformWidget()
+        self.waveform.setMaximumHeight(120)
+
+        layout.addWidget(self.waveform)
+
+    # ---------------- LOGIC (UI SIMULATION) ----------------
+
+    def toggle_play(self) -> None:
+        if self.transport.playing:
+            self.transport.pause()
+        else:
+            self.transport.play()
+
+        if self.transport.playing:
+            self.status.setText("PLAYING")
+            self.status.setStyleSheet("color: #00E676;")
+            self.play_btn.setText("⏸ Pause")
+
+            # Start timing
+            self.timer.start()
+
+        else:
+            self.status.setText("PAUSED")
+            self.status.setStyleSheet("color: #FFC107;")
+            self.play_btn.setText("▶ Play")
+
+            self.timer.stop()
+
+    def stop(self) -> None:
+        self.transport.stop()
+
+        self.timer.stop()
+
+        self.playhead_position = 0.0
+        self.waveform.set_playhead(0.0)
+
+        self.status.setText("STOPPED")
+        self.status.setStyleSheet("color: #FF5252;")
+
+        self.play_btn.setText("▶ Play")
+
+        self.pitch.setValue(0)
+
+    def _update_playhead(self) -> None:
+        """
+        Aktualisiert die Waveform anhand der Transport-Engine.
+        """
+
+        self.waveform.set_playhead(self.transport.playhead)
+
+    def sync_to(self, master_bpm: float) -> None:
+        """
+        Synchronisiert dieses Deck auf Master BPM
+        """
+
+        self.transport.bpm = master_bpm

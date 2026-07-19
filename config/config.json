@@ -1,0 +1,7 @@
+{
+    "theme": "neon",
+    "language": "de",
+    "sample_rate": 48000,
+    "buffer_size": 512,
+    "master_volume": 0.8
+}
