@@ -14,6 +14,7 @@ from pathlib import Path
 
 import soundfile as sf
 import numpy as np
+from audio.metadata import AudioMetadata
 
 
 SUPPORTED_FORMATS = {
@@ -71,4 +72,28 @@ class AudioLoader:
             sample_rate=sample_rate,
             channels=channels,
             duration=duration,
+        )
+    
+    def load_metadata(self, file_path: str | Path) -> AudioMetadata:
+        """
+        Liest grundlegende Metadaten einer Audiodatei
+        """
+
+        path = Path(file_path)
+
+        if not path.exists():
+            raise FileNotFoundError(path)
+        
+        info = sf.info(path)
+
+        return AudioMetadata(
+            path=path,
+            title=path.stem,
+            artist="",
+            album="",
+            duration=info.duration,
+            sample_rate=info.samplerate,
+            channels=info.channels,
+            file_size=path.stat().st_size,
+            extension=path.suffix.lower(),
         )

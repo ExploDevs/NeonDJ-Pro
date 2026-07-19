@@ -2,10 +2,11 @@ from audio.audio_loader import AudioLoader
 
 loader = AudioLoader()
 
-track = loader.load(r"C:\Users\User\Music\dior-2001.mp3")
+metadata = loader.load_metadata("C:/Users/User/Music/dior-2001.mp3")
 
-print(track.path)
-print(track.sample_rate)
-print(track.channels)
-print(track.duration)
-print(track.samples.shape)
+print("Titel:", metadata.title)
+print("Dauer:", metadata.duration)
+print("Samplerate:", metadata.sample_rate)
+print("Kanäle:", metadata.channels)
+print("Dateigröße:", metadata.file_size)
+print("Endung:", metadata.extension)
