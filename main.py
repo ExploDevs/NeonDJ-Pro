@@ -1,28 +1,22 @@
 """
 NeonDJ Pro
-
-Programmstart
+Application Entry Point
 """
 
-from ui.application.application import NeonDJApplication
+import sys
+
+from PySide6.QtWidgets import QApplication
+
 from controller.app_controller import AppController
 
 
 def main() -> int:
-    """
-    Einstiegspunkt der Anwendung.
-    """
 
-    app = NeonDJApplication([])
+    app = QApplication(sys.argv)
 
     controller = AppController()
 
-    controller.logger.info("Qt Application erfolgreich gestartet.")
-
-    controller.show()
-
-
-    return app.run()
+    return controller.run(app)
 
 
 if __name__ == "__main__":

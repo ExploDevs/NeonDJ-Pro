@@ -22,8 +22,10 @@ from ui.widgets.browser.browser_widget import BrowserWidget
 
 class MainWindow(QMainWindow):
 
-    def __init__(self) -> None:
+    def __init__(self, browser_widget,) -> None:
         super().__init__()
+
+        self.browser = browser_widget
 
         self._setup_ui()
 
@@ -55,8 +57,7 @@ class MainWindow(QMainWindow):
         center_layout.setSpacing(8)
 
         # Browser
-        browser = BrowserWidget()
-        browser.setMinimumWidth(340)
+        self.browser.setMinimumWidth(340)
 
         # Deck A
         self.deck_a = DeckWidget("Deck A")
@@ -65,8 +66,7 @@ class MainWindow(QMainWindow):
         deck_a_label = QLabel("DECK A")
         deck_a_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        deck_a_layout = QVBoxLayout(self.deck_a)
-        deck_a_layout.addWidget(deck_a_label)
+       
 
         # Deck B
         self.deck_b = DeckWidget("Deck B")
@@ -75,10 +75,8 @@ class MainWindow(QMainWindow):
         deck_b_label = QLabel("DECK B")
         deck_b_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        deck_b_layout = QVBoxLayout(self.deck_b)
-        deck_b_layout.addWidget(deck_b_label)
 
-        center_layout.addWidget(browser)
+        center_layout.addWidget(self.browser)
         center_layout.addWidget(self.deck_a)
         center_layout.addWidget(self.deck_b)
 

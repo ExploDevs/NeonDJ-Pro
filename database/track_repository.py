@@ -10,6 +10,10 @@ from database.database import Database
 from audio.metadata import AudioMetadata
 from audio.analyzer import AnalysisResult
 
+from pathlib import Path
+
+from audio.track import Track
+
 
 class TrackRepository:
     """
@@ -71,7 +75,12 @@ class TrackRepository:
             """
         )
 
-        return cursor.fetchall()
+        rows = cursor.fetchall()
+
+        return [
+            self._row_to_track(row)
+            for row in rows
+        ]
     
     def search_tracks(self, text: str):
 
@@ -99,4 +108,26 @@ class TrackRepository:
             )
         )
 
-        return cursor.fetchall()
+        rows = cursor.fetchall()
+
+        return [
+            self._row_to_track(row)
+            for row in rows
+        ]
+    
+    def _row_to_track(self, row) -> Track:
+        """
+        Wandelt einen SQLite-Datensatz in ein Track-Objekt um.
+        """
+
+        return Track(
+            path=Path(row["path"]),
+            title=row["title"] or "",
+            artist=row["artist"] or "",
+            album=row["album"] or "",
+            duration=float(row["duration"] or 0.0),
+            bpm=float(row["bpm"] or 0.0),
+            musical_key=row["musical_key"] or "",
+            sample_rate=int(row["sample_rate"] or 44100),
+            channels=int(row["channels"] or 2),
+        )

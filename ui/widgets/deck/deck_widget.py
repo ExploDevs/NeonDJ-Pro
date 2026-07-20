@@ -19,6 +19,7 @@ from PySide6.QtCore import QTimer
 from ui.widgets.waveform.waveform_widget import WaveformWidget
 import time
 from audio.transport import DeckTransport
+from audio.track import Track
 
 
 class DeckWidget(QWidget):
@@ -49,6 +50,10 @@ class DeckWidget(QWidget):
         self.title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.title.setStyleSheet("font-size: 16px; font-weight: bold;")
         layout.addWidget(self.title)
+
+        self.track_info = QLabel("Kein Track geladen")
+        self.track_info.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.track_info)
 
         # ---------------- STATUS ----------------
         self.status = QLabel("STOPPED")
@@ -139,3 +144,16 @@ class DeckWidget(QWidget):
         """
 
         self.transport.bpm = master_bpm
+
+
+    def load_track(self, track: Track) -> None:
+        """
+        Aktualisiert die Deck-Anzeige.
+        """
+
+        self.title.setText(track.title)
+
+        self.track_info.setText(
+            f"{track.artist}\n"
+            f"{track.bpm:.1f} BPM"
+        )

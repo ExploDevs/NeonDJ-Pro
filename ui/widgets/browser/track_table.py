@@ -58,25 +58,25 @@ class TrackTable(QTableWidget):
             self.setItem(
                 row,
                 0,
-                QTableWidgetItem(track["title"] or "")
+                QTableWidgetItem(track.title or "")
             )
 
             self.setItem(
                 row,
                 1,
-                QTableWidgetItem(track["artist"] or "")
+                QTableWidgetItem(track.artist or "")
             )
 
             self.setItem(
                 row,
                 2,
-                QTableWidgetItem(track["album"] or "")
+                QTableWidgetItem(track.album or "")
             )
 
             bpm = ""
 
-            if track["bpm"]:
-                bpm = f"{track['bpm']:.1f}"
+            if track.bpm:
+                bpm = f"{track.bpm:.1f}"
 
             self.setItem(
                 row,
@@ -86,10 +86,10 @@ class TrackTable(QTableWidget):
 
             duration = ""
 
-            if track["duration"]:
+            if track.duration:
 
-                minutes = int(track["duration"] // 60)
-                seconds = int(track["duration"] % 60)
+                minutes = int(track.duration // 60)
+                seconds = int(track.duration % 60)
 
                 duration = f"{minutes}:{seconds:02}"
 
@@ -98,3 +98,27 @@ class TrackTable(QTableWidget):
                 4,
                 QTableWidgetItem(duration)
             )
+
+            self.item(row, 0).setData(
+                Qt.ItemDataRole.UserRole,
+                track,
+            )
+
+    def current_track(self):
+        """
+        Gibt den aktuell ausgewählten Track zurück
+        """
+
+        row = self.currentRow()
+
+        if row < 0:
+            return None
+        
+        item = self.item(row, 0)
+
+        if item is None:
+            return None
+        
+        return item.data(
+            Qt.ItemDataRole.UserRole
+        )

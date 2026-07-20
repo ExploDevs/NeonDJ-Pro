@@ -7,12 +7,16 @@ Verbindet UI und Audio-Engine.
 """
 
 from audio.transport import DeckTransport
+from audio.track import Track
 
 
 class DeckController:
 
     def __init__(self) -> None:
         self.transport = DeckTransport()
+        self.track: Track | None = None
+
+        self.widget = None
 
     def play_pause(self) -> None:
         if self.transport.playing:
@@ -38,3 +42,20 @@ class DeckController:
     @bpm.setter
     def bpm(self, value: float) -> None:
         self.transport.bpm = value
+
+    def set_widget(self, widget) -> None:
+        """
+        Verbindet den Controller mit seinem DeckWidget
+        """
+
+        self.widget = widget
+
+    def load_track(self, track: Track) -> None:
+        """
+        Lädt einen Track in dieses Deck.
+        """
+
+        self.track = track
+
+        if self.widget is not None:
+            self.widget.load_track(track)

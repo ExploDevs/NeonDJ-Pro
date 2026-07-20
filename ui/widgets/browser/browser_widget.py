@@ -14,28 +14,21 @@ from PySide6.QtWidgets import (
     QMessageBox,
 )
 
-from database.database import Database
-from database.track_repository import TrackRepository
+from controller.browser_controller import BrowserController
 
 from .track_table import TrackTable
 
-from audio.audio_loader import AudioLoader
-from audio.analyzer import AudioAnalyzer
-
 class BrowserWidget(QWidget):
 
-    def __init__(self) -> None:
+    def __init__(self, controller: BrowserController):
         super().__init__()
 
-        self.database = Database()
-        self.repository = TrackRepository(
-            self.database
-        )
-
-        self.loader = AudioLoader()
-        self.analyzer = AudioAnalyzer()
+        self.controller = controller
 
         self.table = TrackTable()
+        self.table.itemDoubleClicked.connect(
+            self._track_double_clicked
+        )
 
         self.search = QLineEdit()
         self.search.textChanged.connect(
@@ -59,7 +52,7 @@ class BrowserWidget(QWidget):
 
     def reload(self):
 
-        tracks = self.repository.get_all_tracks()
+        tracks = self.controller.get_tracks()
 
         self.table.load_tracks(tracks)
 
@@ -72,7 +65,7 @@ class BrowserWidget(QWidget):
             self.reload()
             return
         
-        tracks = self.repository.search_tracks(text)
+        tracks = self.controller.search(text)
 
         self.table.load_tracks(tracks)
 
@@ -89,14 +82,7 @@ class BrowserWidget(QWidget):
             return
         try:
 
-            metadata = self.loader.load_metadata(file_name)
-
-            analysis = self.analyzer.analyze(file_name)
-
-            self.repository.add_track(
-                metadata,
-                analysis,
-            )
+            self.controller.import_track(file_name)
 
             self.reload()
 
@@ -107,3 +93,17 @@ class BrowserWidget(QWidget):
                 "Importfehler",
                 str(exc),
             )
+
+    def _track_double_clicked(self) -> None:
+        """
+        Wird bei Doppelklick aufgerufen.
+        """
+
+        track = self.table.current_track()
+
+        if track is None:
+            return
+        
+        print(track.title)
+        
+        self.controller.track_selected.emit(track)
