@@ -12,6 +12,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
+from mutagen import File
+
 import soundfile as sf
 import numpy as np
 from audio.metadata import AudioMetadata
@@ -86,11 +88,28 @@ class AudioLoader:
         
         info = sf.info(path)
 
+        audio = File(path, easy=True)
+
+        title = path.stem
+        artist = ""
+        album = ""
+
+        if audio is not None:
+
+            if "title" in audio:
+                title = audio["title"][0]
+
+            if "artist" in audio:
+                artist = audio["artist"][0]
+
+            if "album" in audio:
+                album = audio["album"][0]
+
         return AudioMetadata(
             path=path,
-            title=path.stem,
-            artist="",
-            album="",
+            title=title,
+            artist=artist,
+            album=album,
             duration=info.duration,
             sample_rate=info.samplerate,
             channels=info.channels,
