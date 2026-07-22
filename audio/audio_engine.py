@@ -8,9 +8,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import numpy as np
+#import numpy as np
 import sounddevice as sd
-import soundfile as sf
+#import soundfile as sf
+
+from audio.deck_player import DeckPlayer
 
 
 class AudioEngine:
@@ -25,21 +27,15 @@ class AudioEngine:
 
         self.stream: sd.OutputStream | None = None
 
-        self.samples: np.ndarray | None = None
-        self.position = 0
+        self.deck = DeckPlayer()
 
     def load(self, file_path: str | Path) -> None:
         """
         Lädt einen Track in den Speicher.
         """
 
-        self.samples, self.sample_rate = sf.read(
-            file_path,
-            dtype='float32',
-            always_2d=True,
-        )
-
-        self.position = 0
+        self.deck.load(file_path)
+        self.sample_rate = self.deck.sample_rate
 
     def _audio_callback(
         self,
@@ -55,27 +51,10 @@ class AudioEngine:
         if status:
             print(status)
 
-        if self.samples is None:
-            outdata.fill(0)
-            return
-        
-        end = self.position + frames
+        chunk = self.deck.next_frames(frames)
 
-        chunk = self.samples[self.position:end]
-
-        if len(chunk) < frames:
-
-            outdata.fill(0)
-
-            outdata[:len(chunk)] = chunk
-
-            self.position = 0
-
-            return
-        
         outdata[:] = chunk
 
-        self.position = end
 
     def start(self) -> None:
 
