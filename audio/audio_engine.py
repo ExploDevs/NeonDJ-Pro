@@ -27,15 +27,18 @@ class AudioEngine:
 
         self.stream: sd.OutputStream | None = None
 
-        self.deck = DeckPlayer()
+        self.deck_a = DeckPlayer()
+        self.deck_b = DeckPlayer()
 
-    def load(self, file_path: str | Path) -> None:
-        """
-        Lädt einen Track in den Speicher.
-        """
+    def load_deck_a(self, file_path: str | Path) -> None:
+        self.deck_a.load(file_path)
+        self.sample_rate = self.deck_a.sample_rate
 
-        self.deck.load(file_path)
-        self.sample_rate = self.deck.sample_rate
+    def load_deck_b(self, file_path: str | Path) -> None:
+        self.deck_b.load(file_path)
+
+        if self.deck_a.samples is None:
+            self.sample_rate = self.deck_b.sample_rate
 
     def _audio_callback(
         self,
@@ -51,15 +54,22 @@ class AudioEngine:
         if status:
             print(status)
 
-        chunk = self.deck.next_frames(frames)
+        chunk_a = self.deck_a.next_frames(frames)
+        chunk_b = self.deck_b.next_frames(frames)
 
-        outdata[:] = chunk
+        mixed = (chunk_a + chunk_b) * 0.5
+
+        outdata[:] = mixed
 
 
     def start(self) -> None:
 
         if self.stream is not None:
             return
+        
+        print("Engine sample_rate:", self.sample_rate)
+        print("Deck A sample_rate:", self.deck_a.sample_rate)
+        print("Deck B sample_rate:", self.deck_b.sample_rate)
         
         self.stream = sd.OutputStream(
             samplerate=self.sample_rate,

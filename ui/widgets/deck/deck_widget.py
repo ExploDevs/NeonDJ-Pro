@@ -1,9 +1,10 @@
 """
 NeonDJ Pro
-Deck Widget (UI-only Version)
 
-Simuliert ein DJ-Deck ohne Audio-Engine.
-Vorbereitung für späteren Sound Layer.
+Deck Widget
+
+Grafische Oberfläche eines DJ-Decks.
+Kommuniziert ausschließlich über den DeckController.
 """
 
 from PySide6.QtWidgets import (
@@ -18,7 +19,6 @@ from PySide6.QtCore import Qt
 from PySide6.QtCore import QTimer
 from ui.widgets.waveform.waveform_widget import WaveformWidget
 import time
-from audio.transport import DeckTransport
 from audio.track import Track
 
 
@@ -36,9 +36,6 @@ class DeckWidget(QWidget):
 
             self.deck_name = deck_name
             self.controller = controller
-            
-            # Transport-Engine dieses Decks
-            self.transport = DeckTransport()
 
             self.timer = QTimer()
             self.timer.setInterval(30)  # ~33 FPS UI Update
@@ -101,12 +98,12 @@ class DeckWidget(QWidget):
     # ---------------- LOGIC (UI SIMULATION) ----------------
 
     def toggle_play(self) -> None:
-        if self.transport.playing:
-            self.transport.pause()
+        if self.controller.playing:
+            self.controller.pause()
         else:
-            self.transport.play()
+            self.controller.play()
 
-        if self.transport.playing:
+        if self.controller.playing:
             self.status.setText("PLAYING")
             self.status.setStyleSheet("color: #00E676;")
             self.play_btn.setText("⏸ Pause")
@@ -122,11 +119,10 @@ class DeckWidget(QWidget):
             self.timer.stop()
 
     def stop(self) -> None:
-        self.transport.stop()
+        self.controller.stop()
 
         self.timer.stop()
 
-        self.playhead_position = 0.0
         self.waveform.set_playhead(0.0)
 
         self.status.setText("STOPPED")
@@ -141,14 +137,16 @@ class DeckWidget(QWidget):
         Aktualisiert die Waveform anhand der Transport-Engine.
         """
 
-        self.waveform.set_playhead(self.transport.playhead)
+        self.waveform.set_playhead(
+            self.controller.player.position
+        )
 
     def sync_to(self, master_bpm: float) -> None:
         """
         Synchronisiert dieses Deck auf Master BPM
         """
 
-        self.transport.bpm = master_bpm
+        pass
 
 
     def load_track(self, track: Track) -> None:

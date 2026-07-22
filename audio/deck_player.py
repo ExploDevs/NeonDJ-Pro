@@ -43,6 +43,9 @@ class DeckPlayer:
             always_2d=True,
         )
 
+        print(f"Loaded {file_path}")
+        print(f"Sample rate: {self.sample_rate}")
+
         self.position = 0
 
     def play(self) -> None:

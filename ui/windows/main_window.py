@@ -22,12 +22,20 @@ from ui.widgets.browser.browser_widget import BrowserWidget
 
 class MainWindow(QMainWindow):
 
-    def __init__(self, browser_widget,) -> None:
-        super().__init__()
+    def __init__(
+        self, 
+        browser_widget,
+        deck_a_controller,
+        deck_b_controller,
+        ) -> None:
+            super().__init__()
 
-        self.browser = browser_widget
+            self.browser = browser_widget
 
-        self._setup_ui()
+            self.deck_a_controller = deck_a_controller
+            self.deck_b_controller = deck_b_controller
+
+            self._setup_ui()
 
     def _setup_ui(self) -> None:
 
@@ -60,7 +68,10 @@ class MainWindow(QMainWindow):
         self.browser.setMinimumWidth(340)
 
         # Deck A
-        self.deck_a = DeckWidget("Deck A")
+        self.deck_a = DeckWidget(
+             "Deck A",
+             self.deck_a_controller,
+        )
         self.deck_a.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         deck_a_label = QLabel("DECK A")
@@ -69,7 +80,10 @@ class MainWindow(QMainWindow):
        
 
         # Deck B
-        self.deck_b = DeckWidget("Deck B")
+        self.deck_b = DeckWidget(
+             "Deck B",
+             self.deck_b_controller,
+             )
         self.deck_b.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         deck_b_label = QLabel("DECK B")

@@ -9,6 +9,8 @@ from PySide6.QtWidgets import QApplication
 from controller.browser_controller import BrowserController
 from controller.deck_controller import DeckController
 
+from audio.audio_engine import AudioEngine
+
 from ui.widgets.browser.browser_widget import BrowserWidget
 from ui.windows.main_window import MainWindow
 
@@ -26,12 +28,24 @@ class AppController:
         self.logger = create_logger()
 
         #
+        # Audio
+        #
+        self.audio_engine = AudioEngine()
+
+        #
         # Controller
         #
         self.browser_controller = BrowserController()
 
-        self.deck_a_controller = DeckController()
-        self.deck_b_controller = DeckController()
+        self.deck_a_controller = DeckController(
+            self.audio_engine,
+            "A",
+        )
+
+        self.deck_b_controller = DeckController(
+            self.audio_engine,
+            "B",
+        )
 
         #
         # Widgets
@@ -44,7 +58,9 @@ class AppController:
         # Main Window
         #
         self.main_window = MainWindow(
-            self.browser_widget
+            self.browser_widget,
+            self.deck_a_controller,
+            self.deck_b_controller,
         )
 
         #
