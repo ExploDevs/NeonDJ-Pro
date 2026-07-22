@@ -27,19 +27,24 @@ class DeckWidget(QWidget):
     Ein vollständiges DJ-Deck (UI Simulation).
     """
 
-    def __init__(self, deck_name: str = "Deck") -> None:
-        super().__init__()
+    def __init__(
+        self, 
+        deck_name: str = "Deck",
+        controller=None,
+        ) -> None:
+            super().__init__()
 
-        self.deck_name = deck_name
-        
-        # Transport-Engine dieses Decks
-        self.transport = DeckTransport()
+            self.deck_name = deck_name
+            self.controller = controller
+            
+            # Transport-Engine dieses Decks
+            self.transport = DeckTransport()
 
-        self.timer = QTimer()
-        self.timer.setInterval(30)  # ~33 FPS UI Update
-        self.timer.timeout.connect(self._update_playhead)
+            self.timer = QTimer()
+            self.timer.setInterval(30)  # ~33 FPS UI Update
+            self.timer.timeout.connect(self._update_playhead)
 
-        self._build_ui()
+            self._build_ui()
 
     def _build_ui(self) -> None:
         layout = QVBoxLayout(self)
