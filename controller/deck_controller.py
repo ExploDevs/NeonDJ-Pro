@@ -80,6 +80,17 @@ class DeckController:
 
         self.player.pause()
 
+    def set_pitch(self, pitch: float) -> None:
+        """
+        Übergibt den Putch an den DeckPlayer
+        """
+
+        self.player.set_pitch(pitch)
+
+    @property
+    def pitch(self) -> float:
+        return self.player.get_pitch()
+
     def stop(self) -> None:
         """
         Stoppt die Wiedergabe 

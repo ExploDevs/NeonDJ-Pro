@@ -57,6 +57,17 @@ class DeckWidget(QWidget):
         self.track_info.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.track_info)
 
+        time_row = QHBoxLayout()
+
+        self.current_time = QLabel("00:00")
+        self.total_time = QLabel("00:00")
+
+        time_row.addWidget(self.current_time)
+        time_row.addStretch()
+        time_row.addWidget(self.total_time)
+
+        layout.addLayout(time_row)
+
         # ---------------- STATUS ----------------
         self.status = QLabel("STOPPED")
         self.status.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -85,6 +96,9 @@ class DeckWidget(QWidget):
         self.pitch.setMinimum(-100)
         self.pitch.setMaximum(100)
         self.pitch.setValue(0)
+        self.pitch.valueChanged.connect(
+            self._pitch_changed
+        )
 
         layout.addWidget(QLabel("Pitch"))
         layout.addWidget(self.pitch)
@@ -132,13 +146,34 @@ class DeckWidget(QWidget):
 
         self.pitch.setValue(0)
 
+    def _pitch_changed(self, value: int) -> None:
+        """
+        Pitch-Slider wurde bewegt
+        """
+
+        factor = 1.0 + (value / 100.0)
+
+        self.controller.set_pitch(factor)
+
     def _update_playhead(self) -> None:
         """
         Aktualisiert die Waveform anhand der Transport-Engine.
         """
 
         self.waveform.set_playhead(
-            self.controller.player.position
+            self.controller.player.progress
+        )
+
+        self.current_time.setText(
+            self._format_time(
+                self.controller.player.current_time
+            )
+        )
+
+        self.total_time.setText(
+            self._format_time(
+                self.controller.player.duration
+            )
         )
 
     def sync_to(self, master_bpm: float) -> None:
@@ -160,3 +195,13 @@ class DeckWidget(QWidget):
             f"{track.artist}\n"
             f"{track.bpm:.1f} BPM"
         )
+
+    def _format_time(self, seconds: float) -> str:
+        """
+        Formatiert Sekunden als MM:SS
+        """
+
+        minutes = int(seconds) // 60
+        secs = int(seconds) % 60
+
+        return f"{minutes:02} :{secs:02}"
