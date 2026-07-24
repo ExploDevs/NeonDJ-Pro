@@ -10,6 +10,8 @@ from PySide6.QtWidgets import QWidget
 from PySide6.QtGui import QPainter, QColor, QPen
 from PySide6.QtCore import Qt, QRectF
 
+from audio.waveform import WaveformGenerator
+
 
 class WaveformWidget(QWidget):
     """
@@ -23,8 +25,10 @@ class WaveformWidget(QWidget):
         self.setMinimumHeight(120)
         self.setAttribute(Qt.WidgetAttribute.WA_OpaquePaintEvent)
 
-        # Dummy waveform data (später Audio FFT)
-        self.samples = self._generate_dummy_waveform()
+        # waveform data (später Audio FFT)
+        self.generator = WaveformGenerator()
+
+        self.samples = []
 
         self.playhead = 0.3  # 0.0 - 1.0 (Position im Track)
 
@@ -62,6 +66,9 @@ class WaveformWidget(QWidget):
         height = rect.height()
 
         mid_y = height / 2
+
+        if len(self.samples) == 0:
+            return
 
         step = width / len(self.samples)
 
@@ -102,4 +109,16 @@ class WaveformWidget(QWidget):
         Setzt Abspielposition (0.0 - 1.0)
         """
         self.playhead = max(0.0, min(1.0, position))
+        self.update()
+
+    def set_audio(self, samples) -> None:
+        """
+        Erzeugt aus Audiodateien eine Waveform.
+        """
+
+        self.samples = self.generator.generate(
+            samples,
+            width=500,
+        )
+
         self.update()

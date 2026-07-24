@@ -8,6 +8,7 @@ Verbindet UI und Audio-Engine.
 
 from audio.track import Track
 from audio.audio_engine import AudioEngine
+from ui.widgets.deck.deck_widget import DeckWidget
 
 
 class DeckController:
@@ -62,8 +63,14 @@ class DeckController:
 
         if self.deck == "A":
             self.audio_engine.load_deck_a(track.path)
+            samples = self.audio_engine.deck_a.samples
         else:
             self.audio_engine.load_deck_b(track.path)
+            samples = self.audio_engine.deck_b.samples
+
+        if self.widget is not None:
+            self.widget.load_track(track)
+            self.widget.waveform.set_audio(samples)
 
     def play(self) -> None:
         """
